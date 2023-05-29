@@ -19,7 +19,7 @@ namespace Minsk.CodeAnalysis
         CloseParenteshisToken,
 
         //Expressions
-        NumberExpression,
+        LiteralExpression,
         BinaryExpression,
         ParenthesizedExpression
     }
