@@ -4,18 +4,21 @@ using System.Linq;
 
 namespace Minsk.CodeAnalysis
 {
-    enum SyntaxKind
+    public enum SyntaxKind
     {
-        NumberToken,
+        // Tokens
+        BadToken,
+        EndOfFileToken,
         WhitespaceToken,
+        NumberToken,
         OpenParenthesisToken,
         SlashToken,
         StarToken,
         MinusToken,
         PlusToken,
         CloseParenteshisToken,
-        BadToken,
-        EndOfFileToken,
+
+        //Expressions
         NumberExpression,
         BinaryExpression,
         ParenthesizedExpression

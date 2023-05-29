@@ -2,11 +2,11 @@
 
 namespace Minsk
 {
-    class Program
+    internal static class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
-            bool showTree = false;
+            var showTree = false;
 
             while (true)
             {
@@ -34,7 +34,7 @@ namespace Minsk
                     var color = Console.ForegroundColor;
                     Console.ForegroundColor = ConsoleColor.DarkGray;
                     PrettyPrint(syntaxTree.Root);
-                    Console.ForegroundColor = color;
+                    Console.ResetColor();
                 }
 
 
@@ -53,7 +53,7 @@ namespace Minsk
                     {
                         Console.WriteLine(diagnostic);
                     }
-                    Console.ForegroundColor = color;
+                    Console.ResetColor();
                 }
             }
         }
