@@ -67,7 +67,7 @@ namespace Minsk.CodeAnalysis
             var left = ParsePrimaryExpression();
             while (true)
             {
-                var precedence = GetBinaryOperatorprecedence(Current.Kind);
+                var precedence = Current.Kind.GetBinaryOperatorprecedence();
                 if (precedence == 0 || precedence <= parentPrecedence)
                     break;
                 var operatorToken = NextToken();
@@ -77,21 +77,6 @@ namespace Minsk.CodeAnalysis
             return left;
         }
 
-        private static int GetBinaryOperatorprecedence(SyntaxKind kind)
-        {
-            switch (kind)
-            {
-                case SyntaxKind.StarToken:
-                    return 2;
-                case SyntaxKind.SlashToken:
-                    return 2;
-                case SyntaxKind.PlusToken:
-                    return 1;
-                case SyntaxKind.MinusToken:
-                    return 1;
-                default: return 0;
-            }
-        }
         private ExpressionSyntax ParsePrimaryExpression()
         {
             if (Current.Kind == SyntaxKind.OpenParenthesisToken)
