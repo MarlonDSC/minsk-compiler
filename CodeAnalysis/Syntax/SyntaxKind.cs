@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 namespace Minsk.CodeAnalysis.Syntax
 {
     public enum SyntaxKind
@@ -11,17 +7,22 @@ namespace Minsk.CodeAnalysis.Syntax
         EndOfFileToken,
         WhitespaceToken,
         NumberToken,
-        OpenParenthesisToken,
-        SlashToken,
-        StarToken,
-        MinusToken,
         PlusToken,
-        CloseParenteshisToken,
+        MinusToken,
+        StarToken,
+        SlashToken,
+        OpenParenthesisToken,
+        CloseParenthesisToken,
+        IdentifierToken,
 
-        //Expressions
+        // Keywords
+        FalseKeyword,
+        TrueKeyword,
+
+        // Expressions
         LiteralExpression,
+        UnaryExpression,
         BinaryExpression,
         ParenthesizedExpression,
-        UnaryExpression
     }
 }

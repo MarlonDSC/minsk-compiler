@@ -1,3 +1,5 @@
+using System;
+
 namespace Minsk.CodeAnalysis.Binding
 {
     internal sealed class BoundBinaryExpression : BoundExpression
@@ -11,7 +13,6 @@ namespace Minsk.CodeAnalysis.Binding
 
         public override BoundNodeKind Kind => BoundNodeKind.UnaryExpression;
         public override Type Type => Left.Type;
-
         public BoundExpression Left { get; }
         public BoundBinaryOperatorKind OperatorKind { get; }
         public BoundExpression Right { get; }

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Minsk.CodeAnalysis.Syntax
 {
     public sealed class BinaryExpressionSyntax : ExpressionSyntax

@@ -1,12 +1,16 @@
-﻿using Minsk.CodeAnalysis;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+using Minsk.CodeAnalysis;
 using Minsk.CodeAnalysis.Binding;
 using Minsk.CodeAnalysis.Syntax;
 
 namespace Minsk
 {
     internal static class Program
-    {
-        private static void Main(string[] args)
+    {        
+        private static void Main()
         {
             var showTree = false;
 
@@ -20,7 +24,7 @@ namespace Minsk
                 if (line == "#showTree")
                 {
                     showTree = !showTree;
-                    Console.WriteLine(showTree ? "Showing parse trees." : "Not showing parse trees.");
+                    Console.WriteLine(showTree ? "Showing parse trees." : "Not showing parse trees");
                     continue;
                 }
                 else if (line == "#cls")
@@ -32,18 +36,18 @@ namespace Minsk
                 var syntaxTree = SyntaxTree.Parse(line);
                 var binder = new Binder();
                 var boundExpression = binder.BindExpression(syntaxTree.Root);
-                IReadOnlyList<string> diagnostics = syntaxTree.Diagnostics.Concat(binder.Diagnostics).ToArray();
+
+                var diagnostics = syntaxTree.Diagnostics.Concat(binder.Diagnostics).ToArray();
+
 
                 if (showTree)
                 {
-                    var color = Console.ForegroundColor;
-                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    Console.ForegroundColor = ConsoleColor.DarkGray;                
                     PrettyPrint(syntaxTree.Root);
                     Console.ResetColor();
                 }
 
-
-                if (!syntaxTree.Diagnostics.Any())
+                if (!diagnostics.Any())
                 {
                     var e = new Evaluator(boundExpression);
                     var result = e.Evaluate();
@@ -51,13 +55,11 @@ namespace Minsk
                 }
                 else
                 {
-                    var color = Console.ForegroundColor;
                     Console.ForegroundColor = ConsoleColor.DarkRed;
 
-                    foreach (var diagnostic in syntaxTree.Diagnostics)
-                    {
+                    foreach (var diagnostic in diagnostics)
                         Console.WriteLine(diagnostic);
-                    }
+
                     Console.ResetColor();
                 }
             }
@@ -70,6 +72,7 @@ namespace Minsk
             Console.Write(indent);
             Console.Write(marker);
             Console.Write(node.Kind);
+
             if (node is SyntaxToken t && t.Value != null)
             {
                 Console.Write(" ");
@@ -77,12 +80,12 @@ namespace Minsk
             }
 
             Console.WriteLine();
-
-            indent += isLast ? "    " : "│   ";
+            
+            indent += isLast ? "   " : "│   ";
 
             var lastChild = node.GetChildren().LastOrDefault();
 
-            foreach (var child in node.GetChildren())
+            foreach (var child in node.GetChildren())            
                 PrettyPrint(child, indent, child == lastChild);
         }
     }

@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Linq;
+
 namespace Minsk.CodeAnalysis.Syntax
 {
     public sealed class SyntaxToken : SyntaxNode
@@ -11,7 +14,6 @@ namespace Minsk.CodeAnalysis.Syntax
         }
 
         public override SyntaxKind Kind { get; }
-
         public int Position { get; }
         public string Text { get; }
         public object Value { get; }

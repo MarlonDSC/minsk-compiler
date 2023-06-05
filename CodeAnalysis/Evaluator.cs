@@ -1,3 +1,4 @@
+﻿using System;
 using Minsk.CodeAnalysis.Binding;
 using Minsk.CodeAnalysis.Syntax;
 
@@ -9,23 +10,22 @@ namespace Minsk.CodeAnalysis
 
         public Evaluator(BoundExpression root)
         {
-            this._root = root;
+            _root = root;
         }
 
-        public int Evaluate()
+        public object Evaluate()
         {
             return EvaluateExpression(_root);
         }
 
-        private int EvaluateExpression(BoundExpression node)
+        private object EvaluateExpression(BoundExpression node)
         {
             if (node is BoundLiteralExpression n)
-            {
-                return (int)n.Value;
-            }
+                return n.Value;
+
             if (node is BoundUnaryExpression u)
             {
-                var operand = EvaluateExpression(u.Right);
+                var operand = (int) EvaluateExpression(u.Operand);
 
                 switch (u.OperatorKind)
                 {
@@ -36,12 +36,13 @@ namespace Minsk.CodeAnalysis
                     default:
                         throw new Exception($"Unexpected unary operator {u.OperatorKind}");
                 }
-
             }
+
             if (node is BoundBinaryExpression b)
             {
-                var left = EvaluateExpression(b.Left);
-                var right = EvaluateExpression(b.Right);
+                var left = (int) EvaluateExpression(b.Left);
+                var right = (int) EvaluateExpression(b.Right);
+
                 switch (b.OperatorKind)
                 {
                     case BoundBinaryOperatorKind.Addition:
@@ -53,7 +54,6 @@ namespace Minsk.CodeAnalysis
                     case BoundBinaryOperatorKind.Division:
                         return left / right;
                     default:
-
                         throw new Exception($"Unexpected binary operator {b.OperatorKind}");
                 }
             }
