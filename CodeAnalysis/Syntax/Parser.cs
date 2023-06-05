@@ -1,4 +1,4 @@
-namespace Minsk.CodeAnalysis
+namespace Minsk.CodeAnalysis.Syntax
 {
     //+1
     //-1 * -3
