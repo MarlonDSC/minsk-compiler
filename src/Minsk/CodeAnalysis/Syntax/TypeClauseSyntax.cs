@@ -1,8 +1,8 @@
 namespace Minsk.CodeAnalysis.Syntax
 {
-    public sealed class TypeClauseSyntax : SyntaxNode
+    public sealed partial class TypeClauseSyntax : SyntaxNode
     {
-        public TypeClauseSyntax(SyntaxTree syntaxTree, SyntaxToken colonToken, SyntaxToken identifier)
+        internal TypeClauseSyntax(SyntaxTree syntaxTree, SyntaxToken colonToken, SyntaxToken identifier)
             : base(syntaxTree)
         {
             ColonToken = colonToken;

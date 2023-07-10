@@ -1,6 +1,7 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Minsk.CodeAnalysis;
@@ -11,12 +12,15 @@ namespace Minsk.IO
 {
     public static class TextWriterExtensions
     {
-        private static bool IsConsoleOut(this TextWriter writer)
+        private static bool IsConsole(this TextWriter writer)
         {
             if (writer == Console.Out)
-                return true;
+                return !Console.IsOutputRedirected;
 
-            if (writer is IndentedTextWriter iw && iw.InnerWriter.IsConsoleOut())
+            if (writer == Console.Error)
+                return !Console.IsErrorRedirected && !Console.IsOutputRedirected; // Color codes are always output to Console.Out
+
+            if (writer is IndentedTextWriter iw && iw.InnerWriter.IsConsole())
                 return true;
 
             return false;
@@ -24,19 +28,22 @@ namespace Minsk.IO
 
         private static void SetForeground(this TextWriter writer, ConsoleColor color)
         {
-            if (writer.IsConsoleOut())
+            if (writer.IsConsole())
                 Console.ForegroundColor = color;
         }
 
         private static void ResetColor(this TextWriter writer)
         {
-            if (writer.IsConsoleOut())
+            if (writer.IsConsole())
                 Console.ResetColor();
         }
 
         public static void WriteKeyword(this TextWriter writer, SyntaxKind kind)
         {
-            writer.WriteKeyword(SyntaxFacts.GetText(kind));
+            var text = SyntaxFacts.GetText(kind);
+            Debug.Assert(kind.IsKeyword() && text != null);
+
+            writer.WriteKeyword(text);
         }
 
         public static void WriteKeyword(this TextWriter writer, string text)
@@ -74,7 +81,10 @@ namespace Minsk.IO
 
         public static void WritePunctuation(this TextWriter writer, SyntaxKind kind)
         {
-            writer.WritePunctuation(SyntaxFacts.GetText(kind));
+            var text = SyntaxFacts.GetText(kind);
+            Debug.Assert(text != null);
+
+            writer.WritePunctuation(text);
         }
 
         public static void WritePunctuation(this TextWriter writer, string text)
@@ -86,7 +96,16 @@ namespace Minsk.IO
 
         public static void WriteDiagnostics(this TextWriter writer, IEnumerable<Diagnostic> diagnostics)
         {
-            foreach (var diagnostic in diagnostics.OrderBy(d => d.Location.FileName)
+            foreach (var diagnostic in diagnostics.Where(d => d.Location.Text == null))
+            {
+                var messageColor = diagnostic.IsWarning ? ConsoleColor.DarkYellow : ConsoleColor.DarkRed;
+                writer.SetForeground(messageColor);
+                writer.WriteLine(diagnostic.Message);
+                writer.ResetColor();
+            }
+
+            foreach (var diagnostic in diagnostics.Where(d => d.Location.Text != null)
+                                                  .OrderBy(d => d.Location.FileName)
                                                   .ThenBy(d => d.Location.Span.Start)
                                                   .ThenBy(d => d.Location.Span.Length))
             {
@@ -101,12 +120,13 @@ namespace Minsk.IO
                 var lineIndex = text.GetLineIndex(span.Start);
                 var line = text.Lines[lineIndex];
 
-                Console.WriteLine();
+                writer.WriteLine();
 
-                Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.Write($"{fileName}({startLine},{startCharacter},{endLine},{endCharacter}): ");
-                Console.WriteLine(diagnostic);
-                Console.ResetColor();
+                var messageColor = diagnostic.IsWarning ? ConsoleColor.DarkYellow : ConsoleColor.DarkRed;
+                writer.SetForeground(messageColor);
+                writer.Write($"{fileName}({startLine},{startCharacter},{endLine},{endCharacter}): ");
+                writer.WriteLine(diagnostic);
+                writer.ResetColor();
 
                 var prefixSpan = TextSpan.FromBounds(line.Start, span.Start);
                 var suffixSpan = TextSpan.FromBounds(span.End, line.End);
@@ -115,19 +135,19 @@ namespace Minsk.IO
                 var error = text.ToString(span);
                 var suffix = text.ToString(suffixSpan);
 
-                Console.Write("    ");
-                Console.Write(prefix);
+                writer.Write("    ");
+                writer.Write(prefix);
 
-                Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.Write(error);
-                Console.ResetColor();
+                writer.SetForeground(ConsoleColor.DarkRed);
+                writer.Write(error);
+                writer.ResetColor();
 
-                Console.Write(suffix);
+                writer.Write(suffix);
 
-                Console.WriteLine();
+                writer.WriteLine();
             }
 
-            Console.WriteLine();
+            writer.WriteLine();
         }
     }
 }

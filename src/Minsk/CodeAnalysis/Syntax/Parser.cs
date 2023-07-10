@@ -16,6 +16,7 @@ namespace Minsk.CodeAnalysis.Syntax
         public Parser(SyntaxTree syntaxTree)
         {
             var tokens = new List<SyntaxToken>();
+            var badTokens = new List<SyntaxToken>();
 
             var lexer = new Lexer(syntaxTree);
             SyntaxToken token;
@@ -23,9 +24,33 @@ namespace Minsk.CodeAnalysis.Syntax
             {
                 token = lexer.Lex();
 
-                if (token.Kind != SyntaxKind.WhitespaceToken &&
-                    token.Kind != SyntaxKind.BadToken)
+                if (token.Kind == SyntaxKind.BadToken)
                 {
+                    badTokens.Add(token);
+                }
+                else
+                {
+                    if (badTokens.Count > 0)
+                    {
+                        var leadingTrivia = token.LeadingTrivia.ToBuilder();
+                        var index = 0;
+
+                        foreach (var badToken in badTokens)
+                        {
+                            foreach (var lt in badToken.LeadingTrivia)
+                                leadingTrivia.Insert(index++, lt);
+
+                            var trivia = new SyntaxTrivia(syntaxTree, SyntaxKind.SkippedTextTrivia, badToken.Position, badToken.Text);
+                            leadingTrivia.Insert(index++, trivia);
+
+                            foreach (var tt in badToken.TrailingTrivia)
+                                leadingTrivia.Insert(index++, tt);
+                        }
+
+                        badTokens.Clear();
+                        token =  new SyntaxToken(token.SyntaxTree, token.Kind, token.Position, token.Text, token.Value, leadingTrivia.ToImmutable(), token.TrailingTrivia);
+                    }
+
                     tokens.Add(token);
                 }
             } while (token.Kind != SyntaxKind.EndOfFileToken);
@@ -62,7 +87,7 @@ namespace Minsk.CodeAnalysis.Syntax
                 return NextToken();
 
             _diagnostics.ReportUnexpectedToken(Current.Location, Current.Kind, kind);
-            return new SyntaxToken(_syntaxTree, kind, Current.Position, null, null);
+            return new SyntaxToken(_syntaxTree, kind, Current.Position, null, null, ImmutableArray<SyntaxTrivia>.Empty, ImmutableArray<SyntaxTrivia>.Empty);
         }
 
         public CompilationUnitSyntax ParseCompilationUnit()
@@ -225,7 +250,7 @@ namespace Minsk.CodeAnalysis.Syntax
             return new VariableDeclarationSyntax(_syntaxTree, keyword, identifier, typeClause, equals, initializer);
         }
 
-        private TypeClauseSyntax ParseOptionalTypeClause()
+        private TypeClauseSyntax? ParseOptionalTypeClause()
         {
             if (Current.Kind != SyntaxKind.ColonToken)
                 return null;
@@ -245,11 +270,11 @@ namespace Minsk.CodeAnalysis.Syntax
             var keyword = MatchToken(SyntaxKind.IfKeyword);
             var condition = ParseExpression();
             var statement = ParseStatement();
-            var elseClause = ParseElseClause();
+            var elseClause = ParseOptionalElseClause();
             return new IfStatementSyntax(_syntaxTree, keyword, condition, statement, elseClause);
         }
 
-        private ElseClauseSyntax ParseElseClause()
+        private ElseClauseSyntax? ParseOptionalElseClause()
         {
             if (Current.Kind != SyntaxKind.ElseKeyword)
                 return null;
@@ -324,15 +349,25 @@ namespace Minsk.CodeAnalysis.Syntax
 
         private ExpressionSyntax ParseAssignmentExpression()
         {
-            if (Peek(0).Kind == SyntaxKind.IdentifierToken &&
-                Peek(1).Kind == SyntaxKind.EqualsToken)
+            if (Peek(0).Kind == SyntaxKind.IdentifierToken)
             {
-                var identifierToken = NextToken();
-                var operatorToken = NextToken();
-                var right = ParseAssignmentExpression();
-                return new AssignmentExpressionSyntax(_syntaxTree, identifierToken, operatorToken, right);
-            }
+                switch (Peek(1).Kind)
+                {
+                    case SyntaxKind.PlusEqualsToken:
+                    case SyntaxKind.MinusEqualsToken:
+                    case SyntaxKind.StarEqualsToken:
+                    case SyntaxKind.SlashEqualsToken:
+                    case SyntaxKind.AmpersandEqualsToken:
+                    case SyntaxKind.PipeEqualsToken:
+                    case SyntaxKind.HatEqualsToken:
+                    case SyntaxKind.EqualsToken:
+                        var identifierToken = NextToken();
+                        var operatorToken = NextToken();
+                        var right = ParseAssignmentExpression();
+                        return new AssignmentExpressionSyntax(_syntaxTree, identifierToken, operatorToken, right);
+                }
 
+            }
             return ParseBinaryExpression();
         }
 

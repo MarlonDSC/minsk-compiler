@@ -24,6 +24,9 @@ namespace Minsk.CodeAnalysis.Binding
                 case BoundNodeKind.BlockStatement:
                     WriteBlockStatement((BoundBlockStatement)node, writer);
                     break;
+                case BoundNodeKind.NopStatement:
+                    WriteNopStatement((BoundNopStatement)node, writer);
+                    break;
                 case BoundNodeKind.VariableDeclaration:
                     WriteVariableDeclaration((BoundVariableDeclaration)node, writer);
                     break;
@@ -65,6 +68,9 @@ namespace Minsk.CodeAnalysis.Binding
                     break;
                 case BoundNodeKind.AssignmentExpression:
                     WriteAssignmentExpression((BoundAssignmentExpression)node, writer);
+                    break;
+                case BoundNodeKind.CompoundAssignmentExpression:
+                    WriteCompoundAssignmentExpression((BoundCompoundAssignmentExpression)node, writer);
                     break;
                 case BoundNodeKind.UnaryExpression:
                     WriteUnaryExpression((BoundUnaryExpression)node, writer);
@@ -130,6 +136,12 @@ namespace Minsk.CodeAnalysis.Binding
 
             writer.Indent--;
             writer.WritePunctuation(SyntaxKind.CloseBraceToken);
+            writer.WriteLine();
+        }
+
+        private static void WriteNopStatement(BoundNopStatement node, IndentedTextWriter writer)
+        {
+            writer.WriteKeyword("nop");
             writer.WriteLine();
         }
 
@@ -256,7 +268,7 @@ namespace Minsk.CodeAnalysis.Binding
 
         private static void WriteLiteralExpression(BoundLiteralExpression node, IndentedTextWriter writer)
         {
-            var value = node.Value.ToString();
+            var value = node.Value.ToString()!;
 
             if (node.Type == TypeSymbol.Bool)
             {
@@ -286,6 +298,16 @@ namespace Minsk.CodeAnalysis.Binding
         {
             writer.WriteIdentifier(node.Variable.Name);
             writer.WriteSpace();
+            writer.WritePunctuation(SyntaxKind.EqualsToken);
+            writer.WriteSpace();
+            node.Expression.WriteTo(writer);
+        }
+
+        private static void WriteCompoundAssignmentExpression(BoundCompoundAssignmentExpression node, IndentedTextWriter writer)
+        {
+            writer.WriteIdentifier(node.Variable.Name);
+            writer.WriteSpace();
+            writer.WritePunctuation(node.Op.SyntaxKind);
             writer.WritePunctuation(SyntaxKind.EqualsToken);
             writer.WriteSpace();
             node.Expression.WriteTo(writer);

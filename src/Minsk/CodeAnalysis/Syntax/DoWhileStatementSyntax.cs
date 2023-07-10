@@ -1,8 +1,8 @@
 namespace Minsk.CodeAnalysis.Syntax
 {
-	public sealed class DoWhileStatementSyntax : StatementSyntax
+	public sealed partial class DoWhileStatementSyntax : StatementSyntax
     {
-        public DoWhileStatementSyntax(SyntaxTree syntaxTree, SyntaxToken doKeyword, StatementSyntax body, SyntaxToken whileKeyword, ExpressionSyntax condition)
+        internal DoWhileStatementSyntax(SyntaxTree syntaxTree, SyntaxToken doKeyword, StatementSyntax body, SyntaxToken whileKeyword, ExpressionSyntax condition)
             : base(syntaxTree)
         {
             DoKeyword = doKeyword;

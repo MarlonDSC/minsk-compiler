@@ -43,6 +43,20 @@
       "frameworks": {
         "net7.0": {
           "targetAlias": "net7.0",
+          "dependencies": {
+            "Microsoft.NET.Compilers.ToolSet": {
+              "target": "Package",
+              "version": "[3.6.0-4.final, )"
+            },
+            "Mono.Cecil": {
+              "target": "Package",
+              "version": "[0.11.2, )"
+            },
+            "System.Collections.Immutable": {
+              "target": "Package",
+              "version": "[7.0.0, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",

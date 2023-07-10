@@ -2,9 +2,9 @@ using System.Collections.Immutable;
 
 namespace Minsk.CodeAnalysis.Syntax
 {
-    public sealed class CompilationUnitSyntax : SyntaxNode
+    public sealed partial class CompilationUnitSyntax : SyntaxNode
     {
-        public CompilationUnitSyntax(SyntaxTree syntaxTree, ImmutableArray<MemberSyntax> members, SyntaxToken endOfFileToken)
+        internal CompilationUnitSyntax(SyntaxTree syntaxTree, ImmutableArray<MemberSyntax> members, SyntaxToken endOfFileToken)
             : base(syntaxTree)
         {
             Members = members;

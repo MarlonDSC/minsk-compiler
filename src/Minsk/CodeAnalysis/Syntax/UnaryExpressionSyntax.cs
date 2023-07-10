@@ -1,8 +1,8 @@
 namespace Minsk.CodeAnalysis.Syntax
 {
-    public sealed class UnaryExpressionSyntax : ExpressionSyntax
+    public sealed partial class UnaryExpressionSyntax : ExpressionSyntax
     {
-        public UnaryExpressionSyntax(SyntaxTree syntaxTree, SyntaxToken operatorToken, ExpressionSyntax operand)
+        internal UnaryExpressionSyntax(SyntaxTree syntaxTree, SyntaxToken operatorToken, ExpressionSyntax operand)
             : base(syntaxTree)
         {
             OperatorToken = operatorToken;

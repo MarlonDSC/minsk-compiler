@@ -1,8 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "8tsC5IHkrdAlXoeFn97b5imVhRve+6+rcCBcj4cV4p9dFWf5ckmtIlqPrFz/Vy/8xTChQ+E+eUO+STGuD4+4Kg==",
+  "dgSpecHash": "C65wkfg7LwxPHmfu4YeyWhqdC3v4JSEh+T3KOdmM9xhYFnd/xLQogkP/YxDrybdXQt6h+9U4TCy88mJEoPNx7g==",
   "success": true,
   "projectFilePath": "C:\\Users\\eddys\\Documents\\Projekte\\Dotnet\\compiler\\minsk-compiler\\src\\Minsk\\Minsk.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\eddys\\.nuget\\packages\\microsoft.net.compilers.toolset\\3.6.0-4.final\\microsoft.net.compilers.toolset.3.6.0-4.final.nupkg.sha512",
+    "C:\\Users\\eddys\\.nuget\\packages\\mono.cecil\\0.11.2\\mono.cecil.0.11.2.nupkg.sha512",
+    "C:\\Users\\eddys\\.nuget\\packages\\system.collections.immutable\\7.0.0\\system.collections.immutable.7.0.0.nupkg.sha512"
+  ],
   "logs": []
 }

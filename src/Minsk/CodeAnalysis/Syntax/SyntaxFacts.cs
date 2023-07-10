@@ -54,6 +54,12 @@ namespace Minsk.CodeAnalysis.Syntax
             }
         }
 
+        public static bool IsComment(this SyntaxKind kind)
+        {
+            return kind == SyntaxKind.SingleLineCommentTrivia ||
+                   kind == SyntaxKind.MultiLineCommentTrivia;
+        }
+
         public static SyntaxKind GetKeywordKind(string text)
         {
             switch (text)
@@ -111,18 +117,26 @@ namespace Minsk.CodeAnalysis.Syntax
             }
         }
 
-        public static string GetText(SyntaxKind kind)
+        public static string? GetText(SyntaxKind kind)
         {
             switch (kind)
             {
                 case SyntaxKind.PlusToken:
                     return "+";
+                 case SyntaxKind.PlusEqualsToken:
+                    return "+=";
                 case SyntaxKind.MinusToken:
                     return "-";
+                case SyntaxKind.MinusEqualsToken:
+                    return "-=";
                 case SyntaxKind.StarToken:
                     return "*";
+                case SyntaxKind.StarEqualsToken:
+                    return "*=";
                 case SyntaxKind.SlashToken:
                     return "/";
+                case SyntaxKind.SlashEqualsToken:
+                    return "/=";
                 case SyntaxKind.BangToken:
                     return "!";
                 case SyntaxKind.EqualsToken:
@@ -141,12 +155,18 @@ namespace Minsk.CodeAnalysis.Syntax
                     return "&";
                 case SyntaxKind.AmpersandAmpersandToken:
                     return "&&";
+                case SyntaxKind.AmpersandEqualsToken:
+                    return "&=";
                 case SyntaxKind.PipeToken:
                     return "|";
+                case SyntaxKind.PipeEqualsToken:
+                    return "|=";
                 case SyntaxKind.PipePipeToken:
                     return "||";
                 case SyntaxKind.HatToken:
                     return "^";
+                case SyntaxKind.HatEqualsToken:
+                    return "^=";
                 case SyntaxKind.EqualsEqualsToken:
                     return "==";
                 case SyntaxKind.BangEqualsToken:
@@ -193,6 +213,54 @@ namespace Minsk.CodeAnalysis.Syntax
                     return "do";
                 default:
                     return null;
+            }
+        }
+
+        public static bool IsTrivia(this SyntaxKind kind)
+        {
+            switch (kind)
+            {
+                case SyntaxKind.SkippedTextTrivia:
+                case SyntaxKind.LineBreakTrivia:
+                case SyntaxKind.WhitespaceTrivia:
+                case SyntaxKind.SingleLineCommentTrivia:
+                case SyntaxKind.MultiLineCommentTrivia:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        public static bool IsKeyword(this SyntaxKind kind)
+        {
+            return kind.ToString().EndsWith("Keyword");
+        }
+
+        public static bool IsToken(this SyntaxKind kind)
+        {
+            return !kind.IsTrivia() &&
+                   (kind.IsKeyword() || kind.ToString().EndsWith("Token"));
+        }
+        public static SyntaxKind GetBinaryOperatorOfAssignmentOperator(SyntaxKind kind)
+        {
+            switch(kind)
+            {
+                case SyntaxKind.PlusEqualsToken:
+                    return SyntaxKind.PlusToken;
+                case SyntaxKind.MinusEqualsToken:
+                    return SyntaxKind.MinusToken;
+                case SyntaxKind.StarEqualsToken:
+                    return SyntaxKind.StarToken;
+                case SyntaxKind.SlashEqualsToken:
+                    return SyntaxKind.SlashToken;
+                case SyntaxKind.AmpersandEqualsToken:
+                    return SyntaxKind.AmpersandToken;
+                case SyntaxKind.PipeEqualsToken:
+                    return SyntaxKind.PipeToken;
+                case SyntaxKind.HatEqualsToken:
+                    return SyntaxKind.HatToken;
+                default:
+                    throw new Exception($"Unexpected syntax: '{kind}'");
             }
         }
     }
